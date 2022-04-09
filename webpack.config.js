@@ -1,12 +1,18 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const CopyPlugin = require("copy-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
 
 module.exports = {
     mode: 'development',
-    entry: './src/index.js',
+    entry: {
+        main: './src/index.js'
+    },
     output: {
-        filename: 'bundle.js',
+        filename: '[name].[contenthash].js',
         path: path.resolve(__dirname, 'build'),
     },
     devServer: {
@@ -16,10 +22,39 @@ module.exports = {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            template: './index.html'
+            template: './src/index.html',
+            // minify: {
+            //     collapseWhitespace: true
+            // }
         }),
-        new CleanWebpackPlugin()
+        new CleanWebpackPlugin(),
+        new CopyPlugin({
+            patterns: [
+                { from: path.resolve(__dirname, 'src/assets/favicon'), to: path.resolve(__dirname, 'build') },
+                { from: path.resolve(__dirname, 'src/assets/img'), to: path.resolve(__dirname, 'build') },
+                { from: path.resolve(__dirname, 'src/assets/blog'), to: path.resolve(__dirname, 'build') },
+            ],
+        }),
+        new MiniCssExtractPlugin({
+            filename: '[name].[contenthash].css',
+        }),
     ],
+    stats: {
+        children: true,
+    },
+    optimization: {
+        minimize: true,
+        splitChunks: {
+            // include all types of chunks
+            chunks: 'all',
+        },
+        minimizer: [
+            // For webpack@5 you can use the `...` syntax to extend existing minimizers (i.e. `terser-webpack-plugin`), uncomment the next line
+            // `...`,
+            new CssMinimizerPlugin(),
+            new TerserPlugin()
+        ],
+    },
     module: {
         rules: [
             {
@@ -34,7 +69,7 @@ module.exports = {
             },
             {
                 test: /\.css$/i,
-                use: ["style-loader", "css-loader"],
+                use: [MiniCssExtractPlugin.loader, "css-loader"],
             },
             {
                 test: /\.(png|jpe?g|gif)$/i,

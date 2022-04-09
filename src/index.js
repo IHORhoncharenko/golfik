@@ -1,6 +1,3 @@
-import "../style.css";
-import companyLogo from '../img/logo.jpg';
+import "./style.css";
 
-
-const mainLogo = document.getElementById('company-logo');
-mainLogo.src = companyLogo;
+console.log('work js');
