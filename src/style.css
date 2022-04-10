@@ -30,7 +30,9 @@ header h1 {
 
 .page-header .container,
 .page-footer .container {
-  max-width: 1408px;  
+  max-width: 1408px;
+  position: relative;
+  margin-left: 100px;  
 }
 
 .container {
